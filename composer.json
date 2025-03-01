@@ -6,7 +6,7 @@
   "version": "1",
   "autoload": {
     "psr-4": {
-      "Gaza\\ValidationGenerator\\": "src/"
+      "Shibu\\ValidationGenerator\\": "src/"
     }
   },
   "authors": [
@@ -29,7 +29,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Gaza\\ValidationGenerator\\ValidationGeneratorServiceProvider"
+        "Shibu\\ValidationGenerator\\ValidationGeneratorServiceProvider"
       ]
     }
   },

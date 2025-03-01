@@ -1,8 +1,8 @@
 <?php
 
-namespace Gaza\ValidationGenerator;
+namespace Shibu\ValidationGenerator;
 
-use Gaza\ValidationGenerator\Console\ValidateTableCommand;
+use Shibu\ValidationGenerator\Console\ValidateTableCommand;
 use Illuminate\Support\ServiceProvider;
 
 class ValidationGeneratorServiceProvider extends ServiceProvider
@@ -23,7 +23,7 @@ class ValidationGeneratorServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__ . '/../resources/data/validationGeneratorConfig.json' => resource_path('vendor/Schema-validation-generator/validationGeneratorConfig.json'),
+            __DIR__ . '/../resources/data/validationGeneratorConfig.json' => resource_path('vendor/gaza-validation-generator/validationGeneratorConfig.json'),
         ]);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Gaza\ValidationGenerator\Console;
+namespace Shibu\ValidationGenerator\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Schema;
