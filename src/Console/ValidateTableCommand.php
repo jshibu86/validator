@@ -54,6 +54,7 @@ class ValidateTableCommand extends Command
             } else {
                 $rules[] = 'required';
             }
+            
 
             // Type-specific rules
             $typeName = strtolower($column->type_name);
