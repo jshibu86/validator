@@ -4,7 +4,7 @@ namespace Shibu\ValidationGenerator\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Facades\DB;
 class ValidateTableCommand extends Command
 {
     /**
@@ -27,74 +27,62 @@ class ValidateTableCommand extends Command
     public function handle()
     {
         $tableName = $this->argument('tableName');
-        if (! Schema::hasTable($tableName)) {
+        $exclude = ['id', 'created_at', 'updated_at', 'deleted_at'];
+
+        if (!Schema::hasTable($tableName)) {
             $this->error("Table '{$tableName}' does not exist.");
-
             return;
         }
 
-        // Get the rule file path
-        $filePath = resource_path('vendor/Schema-validation-generator/validationGeneratorConfig.json');
-        if (! file_exists($filePath)) {
-            $filePath = __DIR__ . '/../../resources/data/validationGeneratorConfig.json';
-        }
+        // Get column details from the information schema
+        $columns = DB::select("SELECT COLUMN_NAME as name, DATA_TYPE as type_name, IS_NULLABLE as nullable, CHARACTER_MAXIMUM_LENGTH as max_length 
+                            FROM information_schema.COLUMNS 
+                            WHERE TABLE_NAME = ? 
+                            AND TABLE_SCHEMA = DATABASE()", [$tableName]);
 
-        if (! file_exists($filePath)) {
-            $this->error('Rule file not found.');
-
-            return;
-        }
-
-        // Read and process the JSON file
-        $jsonContent = file_get_contents($filePath);
-        $configData = json_decode($jsonContent, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $this->error('Invalid JSON format.');
-
-            return;
-        }
-
-        $exclude = $configData['exclude'];
-        $columnTypeRules = $configData['columnTypeRules'];
-
-        // Get table columns
-        $columns = Schema::getColumns($tableName);
-        //
-
-        // Build validation rules
         $validationRules = [];
+
         foreach ($columns as $column) {
-            if (in_array($column['name'], $exclude)) {
+            if (in_array($column->name, $exclude)) {
                 continue;
             }
+
             $rules = [];
 
-            if ($column['nullable']) {
+            if ($column->nullable === 'YES') {
                 $rules[] = 'nullable';
             } else {
                 $rules[] = 'required';
             }
 
-            // Add type-specific rules
-            $typeName = strtolower($column['type_name']);
-            if (array_key_exists($typeName, $columnTypeRules)) {
-                $rules[] = $columnTypeRules[$typeName];
-            }
-            if (in_array('string', $rules)) {
-                if (preg_match('/\((\d+)\)/', $column['type'], $matches)) {
-                    $rules[] = 'max:' . $matches[1];
+            // Type-specific rules
+            $typeName = strtolower($column->type_name);
+
+            if (in_array($typeName, ['varchar', 'text', 'char'])) {
+                $rules[] = 'string';
+                if ($column->max_length) {
+                    $rules[] = 'max:' . $column->max_length;
                 }
+            } elseif (in_array($typeName, ['int', 'bigint', 'smallint'])) {
+                $rules[] = 'integer';
+            } elseif (in_array($typeName, ['decimal', 'float', 'double'])) {
+                $rules[] = 'numeric';
+            } elseif (in_array($typeName, ['timestamp', 'datetime', 'date'])) {
+                $rules[] = 'date';
+            } elseif ($typeName === 'boolean') {
+                $rules[] = 'boolean';
             }
 
-            // Assign rules to the column
-            $validationRules[$column['name']] = $rules;
+            $validationRules[$column->name] = $rules;
         }
 
         // Output validation array
         $this->info("Validation rules for table '{$tableName}':");
-        $output = str_replace(['":', '{', '}'], ['" =>', '[', ']'], json_encode($validationRules, JSON_PRETTY_PRINT));
-
+        $output = str_replace(
+            ['":', '{', '}'], 
+            ['" =>', '[', ']'], 
+            json_encode($validationRules, JSON_PRETTY_PRINT)
+        );
         $this->line($output);
     }
 }
