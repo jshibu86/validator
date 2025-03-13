@@ -18,15 +18,38 @@
 ## Installation
 
 To install the package, run:
-
+Latest Version:
 ```bash
+
 composer require jshibu86/validator
+
+```
+
+---
+Latest 1.x.x version:
+```bash
+Version 1.0.0
+composer require jshibu86/validator:^1.0
+
+```
+
+---
+Version 1.0.0:
+```bash
+
+composer require jshibu86/validator:1.0.0
+
+```
+
+---
+Latest 2.x.x version:
+```bash
+
 composer require jshibu86/validator:^2.0
 
 ```
 
 ---
-
 ## Usage
 
 Once installed, you can use the provided artisan command to generate validation rules for any table in your database.
