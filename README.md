@@ -21,6 +21,8 @@ To install the package, run:
 
 ```bash
 composer require jshibu86/validator
+composer require jshibu86/validator:^2.0
+
 ```
 
 ---
