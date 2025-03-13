@@ -28,7 +28,6 @@ composer require jshibu86/validator
 ---
 Latest 1.x.x version:
 ```bash
-Version 1.0.0
 composer require jshibu86/validator:^1.0
 
 ```
