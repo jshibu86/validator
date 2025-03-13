@@ -2,24 +2,23 @@
 
 namespace Shibu\ValidationGenerator;
 
-use Shibu\ValidationGenerator\Console\ValidateTableCommand;
 use Illuminate\Support\ServiceProvider;
+use Shibu\ValidationGenerator\Console\ValidateTableCommand;
+use Shibu\ValidationGenerator\Services\ValidationGeneratorService;
 
 class ValidationGeneratorServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     */
     public function register()
     {
+        $this->app->singleton(ValidationGeneratorService::class, function ($app) {
+            return new ValidationGeneratorService();
+        });
+
         $this->commands([
             ValidateTableCommand::class,
         ]);
     }
 
-    /**
-     * Bootstrap services.
-     */
     public function boot()
     {
         $this->publishes([
