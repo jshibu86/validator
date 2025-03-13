@@ -51,9 +51,55 @@ composer require jshibu86/validator:^2.0
 ---
 ## Usage
 
-Once installed, you can use the provided artisan command to generate validation rules for any table in your database.
+After Installed Follow the steps.
+##Step1:
+Add the Service provider to app.php,
+```bash
 
-### Command
+'providers' => [
+    // Other providers...
+    Shibu\ValidationGenerator\Services\ValidationGeneratorServiceProvider::class,
+],
+
+```
+##Step1:
+Use the service to the controller ,
+```bash
+use Shibu\ValidationGenerator\Services\ValidationGeneratorService;
+
+class YourController extends Controller
+{
+    protected $validationService;
+
+    public function __construct(ValidationGeneratorService $validationService)
+    {
+        $this->validationService = $validationService;
+    }
+
+    public function store(Request $request)
+    {
+        $tableName = 'students'; // Pass the table name dynamically or hardcoded
+        $data = $request->all();
+
+        $rules = $this->validationService->generateValidationRules($tableName);
+
+        // Perform validation
+        $validator = \Validator::make($data, $rules);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // If validation passes, save the data
+        // Example:
+        // Student::create($data);
+
+        return response()->json(['message' => 'Data saved successfully']);
+    }
+}
+
+```
+### Command(only for older versions : 1.0,1.0.0)
 
 ```bash
 php artisan validate-table {tableName}
@@ -61,7 +107,7 @@ php artisan validate-table {tableName}
 
 Replace `{tableName}` with the name of the table you want to validate.
 
-### Example
+### Example (only for older versions : 1.0,1.0.0)
 
 For a table named `users` with the following schema:
 
